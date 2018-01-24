@@ -2,54 +2,50 @@ package mycache
 
 import (
 	"sync"
+	"main/util"
 )
 
 type MyCache map[string]interface{}
 
 var once sync.Once
 
-var cache MyCache
-
-var todo MyCache
+var sys MyCache
 
 var mux sync.Mutex
 
 func init() {
 	once.Do(func() {
-		cache = MyCache{}
-		todo = MyCache{}
+		sys = MyCache{}
 	})
 }
 
-func GetTodoCache() MyCache {
-	return todo
+func GetCache(name string) *MyCache{
+	cache,err := Get(&sys,name)
+	if err == false{
+		cache =&MyCache{}
+		Put(&sys,name,cache)
+	}
+	return cache.(*MyCache)
 }
 
-func GetFinCache() MyCache {
-	return cache
-}
-
-func Put(cache MyCache, key string, value interface{}) {
+func Put(cache *MyCache, key string, value interface{}) {
 	mux.Lock()
 	defer mux.Unlock()
-	cache[key] = value
+	key = util.URL2Base64(key)
+	(*cache)[key] = value
 }
 
-func Get(cache MyCache, key string) (interface{}, bool) {
+func Get(cache *MyCache, key string) (interface{}, bool) {
 	mux.Lock()
 	defer mux.Unlock()
-	elem, ok := cache[key]
+	key = util.URL2Base64(key)
+	elem, ok := (*cache)[key]
 	return elem, ok
 }
 
-func Remove(cache MyCache, key string) {
+func Remove(cache *MyCache, key string) {
 	mux.Lock()
-	delete(cache, key)
+	key = util.URL2Base64(key)
+	delete(*cache, key)
 	mux.Unlock()
-}
-
-func EachItem(cache MyCache, f func(key string, value interface{})) {
-	for key, value := range cache {
-		f(key, value)
-	}
 }

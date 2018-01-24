@@ -1,14 +1,14 @@
-package spider
+package parser
 
 import (
 	"github.com/PuerkitoBio/goquery"
 	"fmt"
-	"strings"
 	"main/util"
+	"main/spider/entity"
 )
 
 type IndexPaser struct {
-	list []JobInfo
+	List []entity.JobInfo
 }
 
 func (this *IndexPaser) SelectorService(i int, selection *goquery.Selection) {
@@ -32,21 +32,21 @@ func (this *IndexPaser) SelectorService(i int, selection *goquery.Selection) {
 	title, _ = util.Gbk2Utf8(title)
 	location, _ = util.Gbk2Utf8(location)
 	url, _ = util.Gbk2Utf8(url)
-	url = util.SubString(url, strings.LastIndex(url, "/"), len(url))
-	Id := util.SubString(url, strings.Index(url, "/")+1, strings.LastIndex(url, "."))
-	this.list = append(this.list, JobInfo{Id, location, date, title, url})
+	var Id string
+	url,Id = util.URL2Id(url)
+	this.List = append(this.List, entity.JobInfo{Id, location, date, title, url})
 }
 
-func (this *IndexPaser) ConnectDocument(target, selector string) *goquery.Selection {
+func (this *IndexPaser) ConnectDocument(target string) *goquery.Selection {
 	doc, err := goquery.NewDocument(target)
 	if err != nil {
 		panic(err.Error())
 		return nil
 	}
-	res := doc.Find(selector)
+	res := doc.Find("div.box.floatl ul li")
 	return res
 }
 
-func (this *IndexPaser) GetDocInfo() []JobInfo{
-	return this.list
+func (this *IndexPaser) GetDocInfo() []entity.JobInfo{
+	return this.List
 }

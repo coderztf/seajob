@@ -1,14 +1,17 @@
 package spider
 
-import "log"
+import (
+	"log"
+	"main/spider/entity"
+)
 
 type DefaultSpider struct {
 }
 
-func (defaultSpider *DefaultSpider) DocumentParsing(url string, parser *Parser) []JobInfo{
+func (defaultSpider *DefaultSpider) DocumentParsing(url string, parser Parser) []entity.JobInfo{
 	log.Println("连接页面...")
-	selector := (*parser).ConnectDocument(url,"div.box.floatl ul li")
+	selector := (parser).ConnectDocument(url)
 	log.Println("解析页面信息...")
-	selector.Each((*parser).SelectorService)
-	return (*parser).GetDocInfo()
+	selector.Each((parser).SelectorService)
+	return (parser).GetDocInfo()
 }
