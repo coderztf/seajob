@@ -21,6 +21,9 @@ func SubString(str string, start, end int) string {
 	if end < 0 || end > length {
 		panic("end is wrong")
 	}
+	if start == end {
+		return ""
+	}
 	return string(rs[start:end])
 }
 

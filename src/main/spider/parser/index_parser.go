@@ -33,7 +33,7 @@ func (this *IndexPaser) SelectorService(i int, selection *goquery.Selection) {
 	location, _ = util.Gbk2Utf8(location)
 	url, _ = util.Gbk2Utf8(url)
 	var Id string
-	url,Id = util.URL2Id(url)
+	url, Id = util.URL2Id(url)
 	this.List = append(this.List, entity.JobInfo{Id, location, date, title, url})
 }
 
@@ -47,6 +47,6 @@ func (this *IndexPaser) ConnectDocument(target string) *goquery.Selection {
 	return res
 }
 
-func (this *IndexPaser) GetDocInfo() []entity.JobInfo{
+func (this *IndexPaser) GetDocInfo() []entity.JobInfo {
 	return this.List
 }

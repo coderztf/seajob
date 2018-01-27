@@ -19,12 +19,13 @@ func init() {
 	})
 }
 
-func GetCache(name string) *MyCache{
-	cache,err := Get(&sys,name)
-	if err == false{
-		cache =&MyCache{}
-		Put(&sys,name,cache)
+func GetCache(name string) *MyCache {
+	_, err := Get(&sys, name)
+	if err == false {
+		cache := &MyCache{}
+		Put(&sys, name, cache)
 	}
+	cache,_ := Get(&sys,name)
 	return cache.(*MyCache)
 }
 

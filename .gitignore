@@ -1,2 +1,4 @@
 # Created by .ignore support plugin (hsz.mobi)
 /pkg/
+将删除 .idea/inspectionProfiles/
+将删除 .idea/workspace.xml

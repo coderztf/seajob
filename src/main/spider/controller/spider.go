@@ -23,30 +23,22 @@ func getDocument(url string) []entity.JobInfo {
 	return list
 }
 
-/**
-@TODO 缓存加锁
- */
 func Service(url string) {
 	location := util.URL2Location(url)
 	locationCache := mycache.GetCache("location")
 	cache, exists := mycache.Get(locationCache, location)
 	if exists == false {
-		mycache.Put(locationCache, location, mycache.InitCacheInfo(location))
-		log.Printf("%s created location cache\n",location)
+		mycache.Put(locationCache, location, entity.InitJobInfoList())
+		log.Printf("%s created location cache\n", location)
 		cache, _ = mycache.Get(locationCache, location)
 	}
-	info := cache.(mycache.CacheInfo)
-	info.Lock.Lock()
+	info := cache.(*entity.JobInfoList)
 	for _, item := range getDocument(url) {
-		_, ok := info.Fin[item.Id]
+		_, ok := info.Index(item)
 		if ok {
 			//缓存命中
 			continue
 		}
-		info.Fin[item.Id] = item
-		info.Todo[item.Id] = item
+		info.Add(item)
 	}
-	info.Lock.Unlock()
-	//写回缓存
-	mycache.Put(locationCache,location,info)
 }

@@ -1,12 +1,10 @@
 package task
 
-var(
+var (
 	Task chan string
 )
 
-func init(){
+func init() {
 	//初始化任务队列
-	Task = make(chan string,5)
+	Task = make(chan string, 5)
 }
-
-

@@ -12,10 +12,9 @@ import (
 )
 
 /**
-@Todo 实现缓存的初始化管理
-@Todo 缓存传参使用地址
-@Todo 实现多用户
 @Todo 根据时间控制宽度
+@Todo 地域信息从首页爬取
+@Todo 根据配置文件设置：页面宽度、爬虫服务并发度
 @Todo 实现跨域调用:拦截器实现
  */
 
@@ -31,7 +30,7 @@ func main() {
 			}
 			mycache.Put(taksCache, url, 1)
 			//base64解码
-			url =util.Base642URL(url)
+			url = util.Base642URL(url)
 			go service(url)
 		}
 	}()
@@ -47,8 +46,8 @@ func main() {
 爬虫服务
  */
 func service(url string) {
-	for{
+	for {
 		controller.Service(url)
-		time.Sleep(300000 * time.Millisecond)
+		time.Sleep(10000 * time.Millisecond)
 	}
 }
