@@ -1,12 +1,12 @@
 package controller
 
 import (
-	"main/mycache"
-	"main/spider/parser"
-	"main/spider/entity"
-	"main/spider"
-	"main/util"
+	"mycache"
+	"spider"
+	"util"
 	"log"
+	"spider/entity"
+	"spider/parser"
 )
 
 var (
@@ -18,7 +18,7 @@ func getDocument(url string) []entity.JobInfo {
 	//parser必须是一个指针类型，否则会报错：method has pointer receiver
 	//parser := &parser.IndexPaser{make([]entity.JobInfo,0)}
 	//list := defaultSpider.DocumentParsing(url,parser)
-	parser := &parser.ProvParser{make([]entity.JobInfo, 0)}
+	parser := &(parser.ProvParser{List: make([]entity.JobInfo, 0)})
 	list := provSpider.DocumentParsing(url, parser)
 	return list
 }

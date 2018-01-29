@@ -2,22 +2,24 @@ package web
 
 import (
 	"net/http"
-	"main/mycache"
+	"mycache"
 	"encoding/json"
 	"log"
-	"main/spider/entity"
+	"spider/entity"
 	"strings"
-	"main/task"
-	"main/util"
+	"task"
+	"util"
+	"conf"
 )
 
 func ReadList(w http.ResponseWriter, r *http.Request) {
 	//获取地域
 	r.ParseForm()
 	location := r.Form["location"][0]
+	location = conf.LocationInfo[location]
 	user := r.Form["user"][0]
 	//加入任务队列
-	task.Task <- util.URL2Base64(strings.Join([]string{"http://", "www.yingjiesheng.com/", location, "job"}, ""))
+	task.Task <- util.URL2Base64(strings.Join([]string{"http://", "www.yingjiesheng.com/", location}, ""))
 	//得到用户的已读表
 	userCache := mycache.GetCache("user")
 	_, exists := mycache.Get(userCache, user)
@@ -31,7 +33,7 @@ func ReadList(w http.ResponseWriter, r *http.Request) {
 	index := (userInfo)[location]
 	//地域缓存
 	locationCache := mycache.GetCache("location")
-	temp, exists := mycache.Get(locationCache, location)
+	temp, exists := mycache.Get(locationCache, util.URL2Location(location))
 	if exists == false {
 		log.Printf("%s doesn't has information \n", location)
 		return

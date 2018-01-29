@@ -1,8 +1,8 @@
 package mycache
 
 import (
-	"main/spider/entity"
 	"sync"
+	"spider/entity"
 )
 
 /**

@@ -16,7 +16,10 @@ type configInfo struct {
 
 type config []configInfo
 
-var conf config
+var (
+	conf         config
+	LocationInfo map[string]string
+)
 
 /**
 获得配置信息实体
@@ -25,9 +28,9 @@ func GetConfig() *config {
 	return &conf
 }
 
-func init2() {
+func init() {
 	conf = make([]configInfo, 0)
-	file, err := os.Open("../config.conf")
+	file, err := os.Open("/home/zhoutiefeng/go-project/seajob/src/conf/config.conf")
 	if err != nil {
 		log.Fatal(err.Error())
 		return
@@ -107,4 +110,13 @@ func (conf config) String() string {
 		}
 	}
 	return res
+}
+
+func (conf *config) Get(name, key string) string {
+	for _, item := range *conf {
+		if item.name == name {
+			return item.confMap[key]
+		}
+	}
+	return ""
 }

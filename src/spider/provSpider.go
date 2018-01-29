@@ -1,25 +1,32 @@
 package spider
 
 import (
-	"main/spider/entity"
-	"main/util"
+	"util"
 	"strings"
 	"strconv"
 	"sync"
 	"fmt"
+	"spider/entity"
+	"spider/parser"
 )
 
 type ProvSpider struct {
 	page int
 }
 
-func (provSpider *ProvSpider) DocumentParsing(url string, parser Parser) []entity.JobInfo {
+func (provSpider *ProvSpider) DocumentParsing(url string, parser parser.Parser) []entity.JobInfo {
 	list := make([]entity.JobInfo, 0)
 	lock := sync.Mutex{}
 	wg := sync.WaitGroup{}
 	if page, nonePage := util.URL2Page(url); page == 0 && page < 5 {
-		//开启三个线程同时爬取
-		for i := 1; i <= 4; i++ {
+		//多线程并发爬取信息
+		widthStr := util.GetConfig().Get("spider", "width")
+		width, err := strconv.Atoi(widthStr)
+		if err != nil {
+			//默认单线程
+			width = 1
+		}
+		for i := 1; i <= width; i++ {
 			pageURL := strings.Join([]string{nonePage, strings.Join([]string{"/list_", strconv.Itoa(page + i)}, ""), ".html"}, "")
 			wg.Add(1)
 			go func() {
@@ -31,9 +38,9 @@ func (provSpider *ProvSpider) DocumentParsing(url string, parser Parser) []entit
 			}()
 		}
 	} else {
-		selector := parser.ConnectDocument(url)
-		selector.Each(parser.SelectorService)
-		list = parser.GetDocInfo()
+		selector := (parser).ConnectDocument(url)
+		selector.Each((parser).SelectorService)
+		list = (parser).GetDocInfo()
 	}
 	wg.Wait()
 	fmt.Printf("url : %s \t has %d infos\n", url, len(list))

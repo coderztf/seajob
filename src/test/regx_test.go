@@ -2,7 +2,7 @@ package test
 
 import (
 	"testing"
-	"main/util"
+	"util"
 	"fmt"
 )
 

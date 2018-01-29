@@ -2,7 +2,7 @@ package mycache
 
 import (
 	"sync"
-	"main/util"
+	"util"
 )
 
 type MyCache map[string]interface{}

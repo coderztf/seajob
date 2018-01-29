@@ -2,9 +2,9 @@ package parser
 
 import (
 	"github.com/PuerkitoBio/goquery"
-	"main/util"
+	"util"
 	"fmt"
-	"main/spider/entity"
+	"spider/entity"
 )
 
 type ProvParser struct {
@@ -15,7 +15,7 @@ func (this *ProvParser) SelectorService(i int, selection *goquery.Selection) {
 	defer func() {
 		if err := recover(); err != nil {
 			html, _ := selection.Html()
-			fmt.Errorf("%s \t occurred at %s", err, string(html))
+			fmt.Errorf("%ss \t occurred at %s", err, string(html))
 		}
 	}()
 	if selection.HasClass("bg_0") || selection.HasClass("bg_1") {

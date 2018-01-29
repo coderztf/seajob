@@ -3,8 +3,8 @@ package parser
 import (
 	"github.com/PuerkitoBio/goquery"
 	"fmt"
-	"main/util"
-	"main/spider/entity"
+	"util"
+	"spider/entity"
 )
 
 type IndexPaser struct {

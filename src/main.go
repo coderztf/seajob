@@ -2,20 +2,20 @@ package main
 
 import (
 	"net/http"
-	"main/web"
+	"web"
 	"log"
 	"time"
-	"main/spider/controller"
-	"main/mycache"
-	"main/task"
-	"main/util"
+	"spider/controller"
+	"mycache"
+	"task"
+	"util"
+	"strconv"
 )
 
 /**
-@Todo 根据时间控制宽度
-@Todo 地域信息从首页爬取
-@Todo 根据配置文件设置：页面宽度、爬虫服务并发度
 @Todo 实现跨域调用:拦截器实现
+@Todo 实现地域的智能匹配
+@Todo 优化区域爬虫逻辑，根据日期，自动开启多线程爬取
  */
 
 func main() {
@@ -46,7 +46,12 @@ func main() {
 爬虫服务
  */
 func service(url string) {
-	for {
+	conf := util.GetConfig().Get("service", "width")
+	width, _ := strconv.Atoi(conf)
+	if width == 0 {
+		width = 1
+	}
+	for i := 0; i < width; i++ {
 		controller.Service(url)
 		time.Sleep(10000 * time.Millisecond)
 	}
