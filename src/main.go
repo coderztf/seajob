@@ -10,14 +10,13 @@ import (
 	"task"
 	"util"
 	"strconv"
+	"spider/entity"
+	"fmt"
 )
 
 /**
-@Todo 实现跨域调用:拦截器实现
-@Todo 实现地域的智能匹配
-@Todo 优化区域爬虫逻辑，根据日期，自动开启多线程爬取
+@Todo 检查北上广是否重复创建缓存
  */
-
 func main() {
 	//创建任务队列
 	taksCache := mycache.GetCache("task")
@@ -34,6 +33,14 @@ func main() {
 			go service(url)
 		}
 	}()
+	go notify()
+	//每隔1小时进行一次gc
+	go func() {
+		for {
+			gc()
+			time.Sleep(1 * time.Hour)
+		}
+	}()
 	//注册查询接口
 	http.HandleFunc("/list", web.ReadList)
 	err := http.ListenAndServe(":8080", nil)
@@ -46,13 +53,62 @@ func main() {
 爬虫服务
  */
 func service(url string) {
-	conf := util.GetConfig().Get("service", "width")
+	conf := "2"
 	width, _ := strconv.Atoi(conf)
 	if width == 0 {
 		width = 1
 	}
-	for i := 0; i < width; i++ {
+	for {
 		controller.Service(url)
 		time.Sleep(10000 * time.Millisecond)
+	}
+}
+
+func notify() {
+	for {
+		log.Print("check notify")
+		userCache := mycache.GetCache("user")
+		locationCache := mycache.GetCache("location")
+		for k, v := range *userCache {
+			userInfo := v.(map[string]int)
+			res := make([]entity.JobInfo, 0)
+			f := false
+			for lk, lv := range *locationCache {
+				locationInfo := lv.(*entity.JobInfoList)
+				if userInfo[lk] < len(*locationInfo) {
+					f = true
+					list := (*locationInfo)[userInfo[lk]:]
+					log.Printf("New Information location : %s of user %s, total count:%d", lk, k, len(list))
+					userInfo[lk] = len(list) + userInfo[lk]
+					for _, item := range list {
+						res = append(res, item)
+					}
+				}
+
+			}
+			if f {
+				log.Println("send mail")
+				//mail.SendMail(res)
+			}
+		}
+		time.Sleep(2 * time.Hour)
+	}
+
+}
+
+func gc() {
+	locationCache := mycache.GetCache("location")
+	for _, v := range *locationCache {
+		list := v.(*entity.JobInfoList)
+		fmt.Printf("before delete elements :%d", len(*list))
+		for i, rcount, rlen := 0, 0, len(*list); i < rlen; i++ {
+			j := i - rcount
+			date, err := time.Parse("2006-01-02", (*list)[j].Date)
+			if err == nil && date.AddDate(0, 0, 3).Before(time.Now()) {
+				(*list) = append((*list)[:j], (*list)[j+1:]...)
+				rcount++
+			}
+		}
+		fmt.Printf("after delete elements :%d", len(*list))
 	}
 }

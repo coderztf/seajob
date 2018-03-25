@@ -5,6 +5,7 @@ import (
 	"util"
 	"fmt"
 	"spider/entity"
+	"time"
 )
 
 type ProvParser struct {
@@ -18,7 +19,7 @@ func (this *ProvParser) SelectorService(i int, selection *goquery.Selection) {
 			fmt.Errorf("%ss \t occurred at %s", err, string(html))
 		}
 	}()
-	if selection.HasClass("bg_0") || selection.HasClass("bg_1") {
+	if selection.HasClass("bg_0") || selection.HasClass("bg_1") || selection.HasClass("tr_list") {
 		//有效行
 		title := selection.Find("td.item1 a").Text()
 		url := selection.Find("td.item1 a").AttrOr("href", "")
@@ -29,8 +30,11 @@ func (this *ProvParser) SelectorService(i int, selection *goquery.Selection) {
 		date, _ = util.Gbk2Utf8(date)
 		var location, id string
 		title, location = util.Title2Location(title)
-		url, id = util.URL2Id(url)
-		this.List = append(this.List, entity.JobInfo{id, location, date, title, url})
+		_, id = util.URL2Id(url)
+		t1, err := time.Parse("2006-01-02", date)
+		if err == nil && t1.AddDate(0, 0, 3).After(time.Now()) {
+			this.List = append(this.List, entity.JobInfo{id, location, date, title, url})
+		}
 	}
 }
 

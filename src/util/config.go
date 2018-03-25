@@ -7,6 +7,7 @@ import (
 	"io"
 	"strings"
 	"fmt"
+	"path/filepath"
 )
 
 type configInfo struct {
@@ -24,13 +25,15 @@ var (
 /**
 获得配置信息实体
  */
-func GetConfig() *config {
+func getConfig() *config {
 	return &conf
 }
 
-func init() {
+func init2() {
 	conf = make([]configInfo, 0)
-	file, err := os.Open("/home/zhoutiefeng/go-project/seajob/src/conf/config.conf")
+	current, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+	parrent := SubString(current, 0, strings.LastIndex(current, "/"))
+	file, err := os.Open(strings.Join([]string{parrent, "/conf/config.conf"}, ""))
 	if err != nil {
 		log.Fatal(err.Error())
 		return

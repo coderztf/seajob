@@ -20,14 +20,19 @@ func (provSpider *ProvSpider) DocumentParsing(url string, parser parser.Parser) 
 	wg := sync.WaitGroup{}
 	if page, nonePage := util.URL2Page(url); page == 0 && page < 5 {
 		//多线程并发爬取信息
-		widthStr := util.GetConfig().Get("spider", "width")
+		widthStr := "4"
 		width, err := strconv.Atoi(widthStr)
 		if err != nil {
 			//默认单线程
 			width = 1
 		}
 		for i := 1; i <= width; i++ {
-			pageURL := strings.Join([]string{nonePage, strings.Join([]string{"/list_", strconv.Itoa(page + i)}, ""), ".html"}, "")
+			var pageURL string
+			if strings.Contains(url, "beijing") || strings.Contains(url, "shanghai") || strings.Contains(url, "guangzhou") {
+				pageURL = strings.Join([]string{nonePage, strings.Join([]string{"-morejob-", strconv.Itoa(page + i)}, ""), ".html"}, "")
+			} else {
+				pageURL = strings.Join([]string{nonePage, strings.Join([]string{"/list_", strconv.Itoa(page + i)}, ""), ".html"}, "")
+			}
 			wg.Add(1)
 			go func() {
 				info := provSpider.DocumentParsing(pageURL, parser)

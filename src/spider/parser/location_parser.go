@@ -35,12 +35,11 @@ func (parser *LocationParser) SelectorService(i int, selection *goquery.Selectio
 	}
 	if selection.HasClass("pubMenu") {
 		//pubMenu
-		selection.Find("li a:first").Each(func(i int, selection *goquery.Selection) {
-			location := selection.Text()
-			location, _ = util.Gbk2Utf8(location)
-			url := selection.AttrOr("href", "")
-			parser.locationInfo[location] = strings.Replace(url, "/", "", -1)
-		})
+		first := selection.Find("li a").First()
+		location := first.Text()
+		location, _ = util.Gbk2Utf8(location)
+		url := first.AttrOr("href", "")
+		parser.locationInfo[location] = strings.Replace(url, "/", "", -1)
 	}
 }
 

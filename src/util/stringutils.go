@@ -52,24 +52,42 @@ func URL2Id(str string) (url, id string) {
 
 func URL2Page(str string) (int, string) {
 	exp := regexp.MustCompile("list_\\d+\\.html$")
-	pageURL := exp.FindString(str)
-	if pageURL == "" {
-		return 0, str
+	if exp.MatchString(str) {
+		pageURL := exp.FindString(str)
+		if pageURL == "" {
+			return 0, str
+		}
+		str = strings.Replace(str, pageURL, "", 1)
+		pageURL = strings.Replace(pageURL, "list_", "", 1)
+		pageURL = strings.Replace(pageURL, ".html", "", 1)
+		page, err := strconv.Atoi(pageURL)
+		if err != nil {
+			return 0, str
+		}
+		return page, str
+	} else {
+		exp = regexp.MustCompile("-morejob-\\d+\\.html$")
+		pageURL := exp.FindString(str)
+		pageURL = strings.Replace(pageURL, "-morejob-", "", 1)
+		pageURL = strings.Replace(pageURL, ".html", "", 1)
+		page, err := strconv.Atoi(pageURL)
+		if err != nil {
+			return 0, str
+		}
+		return page, str
 	}
-	str = strings.Replace(str, pageURL, "", 1)
-	pageURL = strings.Replace(pageURL, "list_", "", 1)
-	pageURL = strings.Replace(pageURL, ".html", "", 1)
-	page, err := strconv.Atoi(pageURL)
-	if err != nil {
-		return 0, str
-	}
-	return page, str
+
 }
 
 func URL2Location(str string) (url string) {
 	exp := regexp.MustCompile("\\w+job$")
-	url = exp.FindString(str)
-	url = strings.Replace(url, "job", "", 1)
+	if exp.MatchString(url) {
+		url = exp.FindString(str)
+		url = strings.Replace(url, "job", "", 1)
+	} else {
+		exp = regexp.MustCompile("\\w+$")
+		url = exp.FindString(str)
+	}
 	return url
 }
 
@@ -84,4 +102,12 @@ func Base642URL(str string) string {
 		return str
 	}
 	return string(res)
+}
+
+func Convert(b []byte) string {
+	s := make([]string, len(b))
+	for i := range b {
+		s[i] = strconv.Itoa(int(b[i]))
+	}
+	return strings.Join(s, ",")
 }

@@ -3,7 +3,6 @@ package web
 import (
 	"net/http"
 	"mycache"
-	"encoding/json"
 	"log"
 	"spider/entity"
 	"strings"
@@ -30,7 +29,7 @@ func ReadList(w http.ResponseWriter, r *http.Request) {
 	}
 	tmp, _ := mycache.Get(userCache, user)
 	userInfo := tmp.(map[string]int)
-	index := (userInfo)[location]
+	index := userInfo[location]
 	//地域缓存
 	locationCache := mycache.GetCache("location")
 	temp, exists := mycache.Get(locationCache, util.URL2Location(location))
@@ -43,12 +42,5 @@ func ReadList(w http.ResponseWriter, r *http.Request) {
 	//修改用户缓存
 	(userInfo)[location] = len(list)+index
 	log.Printf("查询新消息%d条\n", len(list))
-	//输出招聘信息
-	json, err := json.Marshal(list)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(json)
 }
+
